@@ -33,16 +33,16 @@ public:
 	void Union(int a, int b)
 	{
 		a = Find(a);
-    b = Find(b);
+    	b = Find(b);
     	
-    if (a != b) 
-    {
-      if (size[a] < size[b])
-        swap(a, b);
+    	if (a != b) 
+    	{
+        	if (size[a] < size[b])
+            	swap(a, b);
 
-      parr[b] = a;
-      size[a] += size[b];
-    }		
+        	parr[b] = a;
+        	size[a] += size[b];
+    	}		
 	}
 
 };
