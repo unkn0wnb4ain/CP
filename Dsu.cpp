@@ -1,4 +1,3 @@
-template <class T>
 class Dsu
 {
 
@@ -15,10 +14,13 @@ public:
 		size.assign(n + 1, 0);
 	}
 
-	void Make(int a)
+	void Build()
 	{
-		parr[a] = a;
-		size[a] = 1;
+		for(int i = 0; i <= n; ++i)
+		{
+			parr[i] = i;
+			size[i] = 1;
+		}
 	}
 
 	int Find(int a)
@@ -43,6 +45,16 @@ public:
         	parr[b] = a;
         	size[a] += size[b];
     	}		
+	}
+
+	int Components()
+	{
+		int comps = 0;
+
+		for(int i = 1; i <= n; ++i)
+			comps += parr[i] == i;
+
+		return comps;
 	}
 
 };
