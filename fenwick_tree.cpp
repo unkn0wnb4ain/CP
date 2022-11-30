@@ -7,13 +7,13 @@ private:
     vector <T> fen;
 
 public:
-    FenwickTree(ll nn)
+    FenwickTree (ll nn)
     {
         n = nn;
         fen.assign(n + 1, 0);
     }
 
-    void Update(ll id, ll del)
+    void Update (ll id, ll del)
     {    
         while(id < fen.size())
         {
@@ -22,15 +22,15 @@ public:
         }     
     }
 
-    void Build(ll a[], ll n)
+    void Build (ll a[], ll n)
     {
-        loop(i, 1, n + 1)
+        for (int i = 1; i < n + 1; ++i)
         {
             Update(i, a[i - 1]);
         }
     }    
 
-    T PrefixSum(ll id)
+    T PrefixSum (ll id)
     {
         ll sum = 0;
         while(id)
@@ -41,7 +41,7 @@ public:
         return sum;
     }
 
-    T Query(ll l, ll r)
+    T Query (ll l, ll r)
     {
         return PrefixSum(r) - PrefixSum(l - 1);
     }
