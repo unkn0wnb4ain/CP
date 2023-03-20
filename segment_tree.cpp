@@ -1,86 +1,93 @@
-template <class T>
-class SegmentTree
+template<typename T>
+class SegmentTree 
 {
-
 private:
-    ll n;
-    const ll k = 0;
-    vector <T> tree;
-    vector <T> v;
+    int n;
+    vector <T> tree, lazy;
+
+    void build (int v, int st, int en, const vector<T>& a) 
+    {
+        if (st == en) 
+            tree[v] = a[st]; 
+        else 
+        {
+            int mid = (st + en) / 2;
+            build (v << 1, st, mid, a);
+            build (v << 1 | 1, mid + 1, en, a);
+            tree[v] = merge(tree[v << 1], tree[v << 1 | 1]);
+        }
+    }
+
+    void propagate(int v, int st, int en) 
+    {
+        if (lazy[v] != 0) 
+        {
+            tree[v] += lazy[v] * (en - st + 1);
+            if (st != en) 
+            {
+                lazy[v << 1] += lazy[v];
+                lazy[v << 1 | 1] += lazy[v];
+            }
+            lazy[v] = 0;
+        }
+    }
+
+    void update (int v, int st, int en, int l, int r, T val) 
+    {
+        propagate (v, st, en);
+        if (r < st || en < l) 
+            return;
+
+        if (l <= st && en <= r) 
+        {
+            lazy[v] += val;
+            propagate (v, st, en);
+        }
+        else 
+        {
+            int mid = (st + en) / 2;
+            update (v << 1, st, mid, l, r, val);
+            update (v << 1 | 1, mid + 1, en, l, r, val);
+            tree[v] = merge (tree[v << 1], tree[v << 1 | 1]);
+        }
+    }
+
+    T query (int v, int st, int en, int l, int r) 
+    {
+        propagate (v, st, en);
+        if (r < st || en < l) 
+            return T(0); 
+
+        if (l <= st && en <= r) 
+            return tree[v];
+
+        int mid = (st + en) / 2;
+        T lefft = query(v << 1, st, mid, l, r);
+        T right = query(v << 1 | 1, mid + 1, en, l, r);
+        return merge (lefft, right);
+    }
+
+    T merge (T x, T y) const {
+        return (x + y); 
+    }
 
 public:
-    SegmentTree(vector <T> &arr)
+    SegmentTree() = default;
+    explicit SegmentTree (const vector<T>& a)
     {
-        n = (ll)arr.size();
-        v = arr;
+        n = a.size();
         tree.assign(4 * n, 0);
-        Build(1, 0, n - 1);
+        lazy.assign(4 * n, 0);
+        build(1, 0, n - 1, a);
     }
 
-    inline T Function(ll x, ll y)
+    void update (int l, int r, T val) 
     {
-        return x + y;
+        update(1, 0, n - 1, l, r, val);
     }
 
-    void Build(ll node, ll start, ll end)
+    T query (int l, int r) 
     {
-        if(start == end)
-            tree[node] = start;
-
-        else
-        {
-            ll mid = (start + end) / 2;
-            ll left = 2 * node;
-            ll right = 2 * node + 1;
-
-            Build(left, start, mid);
-            Build(right, mid + 1, end);
-
-            tree[node] = Function(tree[left], tree[right]);
-        }
+        return query(1, 0, n - 1, l, r);
     }
-
-    T Get_query(ll node, ll start, ll end, ll l, ll r)
-    {
-        if(start > r || end < l)
-            return k;
-
-        if(l <= start && end <= r)
-            return tree[node];
-
-        ll mid = (start + end) / 2;
-        ll left_query = Get_query(2 * node, start, mid, l, r);
-        ll right_query = Get_query(2 * node + 1, mid + 1, end, l, r);
-
-        return Function(left_query, right_query);
-    }    
-
-    T query(ll l, ll r)
-    {
-        return Get_query(1, 0, n - 1, l, r);
-    }
-
-    void Get_update(ll node, ll start, ll end, ll pos, T val)
-    {
-        if(start == end)
-            v[start] = val,
-            tree[node] = val;
-
-        else
-        {
-            ll mid = (start + end) / 2;
-            if(start <= pos && pos <= mid)
-                Get_update(2 * node, start, mid, pos, val);
-            else
-                Get_update(2 * node + 1, mid + 1, end, pos, val);
-
-            tree[node] = Function(tree[2 * node], tree[2 * node + 1]);
-        }
-    }
-
-    void update(ll pos, T val)
-    {
-        Get_update(1, 0, n - 1, pos, val);
-    }
-
 };
