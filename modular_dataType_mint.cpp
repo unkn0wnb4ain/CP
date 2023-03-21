@@ -1,112 +1,151 @@
-const uint p = 1000000007;
+template <int64_t MOD = 1000000007>
+class ModInt {
+private:
+    int64_t val;
 
-template<uint mod = p> struct mint 
-{ 
-    uint val = 0;
-
-    mint(ll val) 
+    int64_t normalize(int64_t val) 
     {
-        val %= mod;
-        if (val < 0) 
-            val += mod;
-        this -> val = val;
+        val %= MOD;
+        if (val < 0) val += MOD;
+        return val;
     }
 
-    mint& operator += (const mint &a) 
+public:
+
+    ModInt () : val(0) {}
+    ModInt (int64_t v) { val = normalize(v); }
+
+    ModInt& operator ++ () 
+    { 
+        return *this += 1; 
+    }
+
+    ModInt& operator -- () 
+    { 
+        return *this -= 1; 
+    }
+
+    ModInt  operator ++ (int) 
+    { 
+        ModInt res(*this); 
+        ++(*this); return res; 
+    }
+
+    ModInt  operator -- (int) 
+    { 
+        ModInt res(*this); 
+        --(*this); return res; 
+    }
+
+    ModInt  operator + () const 
+    { 
+        return ModInt(val); 
+    }
+
+    ModInt  operator - () const 
+    { 
+        return ModInt(MOD - val); 
+    }
+
+    ModInt& operator += (const ModInt& rhs) 
     {
-        val += a.val;
-        if (val >= mod)
-            val -= mod;
+        val = normalize(val + rhs.val);
         return *this;
     }
 
-    mint& operator -= (const mint &a) 
+    ModInt& operator -= (const ModInt& rhs) 
     {
-        val += mod - a.val;
-        if (val >= mod)
-            val -= mod;
+        val = normalize(val - rhs.val + MOD);
         return *this;
     }
 
-    mint& operator *= (const mint &a) 
+    ModInt& operator *= (const ModInt& rhs) 
     {
-        val = (ull)val * a.val % mod;
+        val = val * rhs.val % MOD;
         return *this;
     }
 
-    mint pow(ll pw) const 
+    ModInt& operator /= (const ModInt& rhs) 
     {
-        mint res = 1;
-        mint cur = *this;
-        while(pw) 
+        val = val * rhs.inv();
+        return *this;
+    }
+
+    ModInt operator + (const ModInt& rhs) const 
+    { 
+        return ModInt(*this) += rhs; 
+    }
+
+    ModInt operator - (const ModInt& rhs) const 
+    { 
+        return ModInt(*this) -= rhs; 
+    }
+
+    ModInt operator * (const ModInt& rhs) const 
+    { 
+        return ModInt(*this) *= rhs; 
+    }
+
+    ModInt operator / (const ModInt& rhs) const 
+    { 
+        return ModInt(*this) /= rhs; 
+    }
+
+    ModInt inv() const 
+    {
+        assert (val != 0); 
+        return power(MOD - 2); 
+    }
+
+    ModInt power(int64_t p) const 
+    {
+        ModInt res = 1, x = val;
+        while (p > 0) 
         {
-            if (pw & 1) 
-                res *= cur;
-            cur *= cur;
-            pw >>= 1;
+            if (p & 1) res *= x;
+            x *= x; p >>= 1;
         }
         return res;
     }
 
-    mint inv() const 
+    friend istream& operator >> (istream& is, ModInt& rhs) 
     {
-        //val != 0
-        uint t = val;
-        uint res = 1;
-        while(t != 1) 
-        {
-            uint z = mod / t;
-            res = (ull)res * (mod - z) % mod;
-            t = mod - t * z;
-        }
-        return res;
+        is >> rhs.val;
+        return is;
     }
 
-    mint& operator /= (const mint &a) 
+    friend ostream& operator << (ostream& os, const ModInt& rhs) 
     {
-        return *this *= a.inv();
+        return os << rhs.val;
     }
 
-    mint operator + (const mint &a) const 
+    friend bool operator > (const ModInt& lhs, const ModInt& rhs) 
     {
-        return mint(*this) += a;
+        return lhs.val > rhs.val;
     }
 
-    mint operator - (const mint &a) const 
+    friend bool operator < (const ModInt& lhs, const ModInt& rhs) 
     {
-        return mint(*this) -= a;
+        return lhs.val < rhs.val;
     }
 
-    mint operator * (const mint &a) const 
+    friend bool operator == (const ModInt& lhs, const ModInt& rhs)  
     {
-        return mint(*this) *= a;
+        return lhs.val == rhs.val;
     }
 
-    mint operator / (const mint &a) const 
+    friend bool operator != (const ModInt& lhs, const ModInt& rhs) 
     {
-        return mint(*this) /= a;
+        return !(lhs == rhs);
     }
 
-    bool operator == (const mint &a) const 
+    friend bool operator <= (const ModInt& lhs, const ModInt& rhs) 
     {
-        return val == a.val;
+        return lhs.val <= rhs.val;
     }
 
-    bool operator != (const mint &a) const 
+    friend bool operator >= (const ModInt& lhs, const ModInt& rhs) 
     {
-        return val != a.val;
-    }
-
-    bool operator < (const mint &a) const 
-    {
-        return val < a.val;
-    }
-
-    friend ostream& operator << (ostream &os, const mint &m) 
-    {
-        os << m.val;
-        return os;
+        return lhs.val >= rhs.val;
     }
 };
-
-using Mint = mint <p>;
